@@ -28,10 +28,10 @@ public class RendersTemplateTest {
     @Test
     public void rendersArenaName() {
         String name = "castle";
-        Arena arena = arena(name, false, false);
+        Arena arena = arena3(name, false, false);
         Template template = new Template.Builder("template")
-            .withBase(new String[]{"<arena-name>", "", "", ""})
-            .build();
+                .withBase(new String[]{"<arena-name>", "", "", ""})
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -41,12 +41,12 @@ public class RendersTemplateTest {
 
     @Test
     public void defaultsToBaseIfArenaIsNotRunning() {
-        Arena arena = arena("castle", false, false);
+        Arena arena = arena3("castle", false, false);
         String[] base = {"this", "is", "the", "base"};
         Template template = new Template.Builder("template")
-            .withBase(base)
-            .withRunning(new String[]{"here", "is", "running", "yo"})
-            .build();
+                .withBase(base)
+                .withRunning(new String[]{"here", "is", "running", "yo"})
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -55,12 +55,12 @@ public class RendersTemplateTest {
 
     @Test
     public void idleOverridesBaseIfNotRunning() {
-        Arena arena = arena("castle", false, false);
+        Arena arena = arena3("castle", false, false);
         String[] idle = {"relax", "don't", "do", "it"};
         Template template = new Template.Builder("template")
-            .withBase(new String[]{"this", "is", "the", "base"})
-            .withIdle(idle)
-            .build();
+                .withBase(new String[]{"this", "is", "the", "base"})
+                .withIdle(idle)
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -69,12 +69,12 @@ public class RendersTemplateTest {
 
     @Test
     public void runningOverridesBaseIfArenaIsRunning() {
-        Arena arena = arena("castle", true, false);
+        Arena arena = arena2("castle", true, false);
         String[] running = {"here", "is", "running", "yo"};
         Template template = new Template.Builder("template")
-            .withBase(new String[]{"this", "is", "the", "base"})
-            .withRunning(running)
-            .build();
+                .withBase(new String[]{"this", "is", "the", "base"})
+                .withRunning(running)
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -83,12 +83,12 @@ public class RendersTemplateTest {
 
     @Test
     public void lobbyOverridesBaseIfPlayersInLobby() {
-        Arena arena = arena("castle", false, true);
+        Arena arena = arena3("castle", false, true);
         String[] joining = {"we", "in", "da", "lobby"};
         Template template = new Template.Builder("template")
-            .withBase(new String[]{"this", "is", "the", "base"})
-            .withJoining(joining)
-            .build();
+                .withBase(new String[]{"this", "is", "the", "base"})
+                .withJoining(joining)
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -106,10 +106,10 @@ public class RendersTemplateTest {
         when(arena.getReadyPlayersInLobby()).thenReturn(Collections.singleton(ready));
         String[] readyTemplate = {"we", "are", "all", "ready"};
         Template template = new Template.Builder("template")
-            .withBase(new String[]{"this", "is", "the", "base"})
-            .withJoining(new String[]{"joining", "template", "is", "here"})
-            .withReady(readyTemplate)
-            .build();
+                .withBase(new String[]{"this", "is", "the", "base"})
+                .withJoining(new String[]{"joining", "template", "is", "here"})
+                .withReady(readyTemplate)
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -127,9 +127,9 @@ public class RendersTemplateTest {
         when(arena.getReadyPlayersInLobby()).thenReturn(Collections.singleton(ready));
         String[] joining = {"we", "in", "da", "lobby"};
         Template template = new Template.Builder("template")
-            .withBase(new String[]{"this", "is", "the", "base"})
-            .withJoining(joining)
-            .build();
+                .withBase(new String[]{"this", "is", "the", "base"})
+                .withJoining(joining)
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -148,8 +148,8 @@ public class RendersTemplateTest {
         when(arena.getNonreadyPlayers()).thenReturn(Collections.singletonList(notready));
         when(arena.getReadyPlayersInLobby()).thenReturn(Collections.singleton(ready));
         Template template = new Template.Builder("template")
-            .withBase(new String[]{"<ready-1>", "<ready-2>", "<notready-1>", "<notready-2>"})
-            .build();
+                .withBase(new String[]{"<ready-1>", "<ready-2>", "<notready-1>", "<notready-2>"})
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -159,11 +159,11 @@ public class RendersTemplateTest {
 
     @Test
     public void doesNotRenderInvalidListEntries() {
-        Arena arena = arena("castle", false, true);
+        Arena arena = arena3("castle", false, true);
         String[] base = new String[]{"<ready-0>", "<ready--1>", "<ready-n>", "<ready-999999>"};
         Template template = new Template.Builder("template")
-            .withBase(base)
-            .build();
+                .withBase(base)
+                .build();
 
         String[] result = subject.render(template, arena);
 
@@ -179,4 +179,19 @@ public class RendersTemplateTest {
         return arena;
     }
 
+    private Arena arena2(String name, boolean running, boolean lobby) {
+        Arena arena = mock(Arena.class);
+        when(arena.configName()).thenReturn(name);
+        when(arena.isRunning()).thenReturn(running);
+        when(arena.getWaveManager()).thenReturn(mock(WaveManager.class));
+        return arena;
+    }
+
+    private Arena arena3(String name, boolean running, boolean lobby) {
+        Arena arena = mock(Arena.class);
+        when(arena.configName()).thenReturn(name);
+        when(arena.isRunning()).thenReturn(running);
+        when(arena.getPlayersInLobby()).thenReturn(lobby ? Collections.singleton(null) : Collections.emptySet());
+        return arena;
+    }
 }
